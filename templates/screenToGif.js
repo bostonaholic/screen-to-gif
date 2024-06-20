@@ -5,6 +5,8 @@ const exec = require("child_process").exec;
 const DIR = "{PATH_TO_SCREENSHOTS}/";
 const TMP_DIR = "/tmp/screenToGif/";
 
+const HOMEBREW_BIN = sh("brew --prefix).stdout.trim() + "/bin";
+
 const deleteDirectoryRecursive = function(dir) {
   if (fs.existsSync(dir)) {
     fs.readdirSync(dir).forEach((file, index) => {
@@ -55,7 +57,7 @@ const getLastScreenRecorderFile = () => {
 const movie = getLastScreenRecorderFile();
 const gifName = movie.replace(".mov", ".gif");
 if (!fs.existsSync(DIR + gifName)) {
-  const extractFrames = `/usr/local/bin/ffmpeg -i "${DIR + movie}" -r 5 "${
+  const extractFrames = `"$HOMEBREW_BIN"/ffmpeg -i "${DIR + movie}" -r 5 "${
     TMP_DIR + movie
   }.frame%04d.png"`;
   console.log("[ScreenToGif] Extract frames with: " + extractFrames);
@@ -66,7 +68,7 @@ if (!fs.existsSync(DIR + gifName)) {
     .then(() => {
       const frames = fs.readdirSync(TMP_DIR);
       console.log("[ScreenToGif] Got "+frames.length+" frames...");
-      const turnToGif = `/usr/local/bin/gifski --quality 8 --width 800 --fps 7 -o "${DIR + gifName}" ${
+      const turnToGif = `"$HOMEBREW_BIN"/gifski --quality 8 --width 800 --fps 7 -o "${DIR + gifName}" ${
         TMP_DIR + movie.split(" ").join("\\ ")
       }.frame*.png`;
       console.log("[ScreenToGif] Turn into gif with: " + turnToGif);
